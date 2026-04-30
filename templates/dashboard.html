@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        /* Center everything */
+        .container {
+            text-align: center;
+        }
+
+        /* Welcome heading */
+        .welcome {
+            font-size: 1.2rem;
+            color: #b5b5ff;
+            margin-bottom: 0.3rem;
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 2rem;
+        }
+
+        /* Bigger cards */
+        .dashboard-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            width: 220px;
+            height: 140px;
+            font-size: 1.2rem;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            text-decoration: none;
+            color: white;
+        }
+
+        .stat-box span {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        .stat-box:hover {
+            transform: scale(1.08);
+        }
+
+        /* Bigger buttons */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            font-size: 1rem;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container glass-card">
+
+    <!-- 🔥 NEW HEADER -->
+    <div class="welcome">Welcome to</div>
+    <div class="main-title">ABC Mart</div>
+    <h2 class="main-title">Inventory Dashboard</h2>
+
+    <div class="subtitle">
+        Smart monitoring system for product expiry and stock management
+    </div>
+
+    <!-- 🔹 CARDS -->
+    <div class="dashboard-stats">
+
+        <a href="/view_expiry?type=safe" class="stat-box bg-safe">
+            Safe Products
+            <span>{{safe}}</span>
+        </a>
+
+        <a href="/view_expiry?type=month" class="stat-box bg-month">
+            Expiring in 30 Days
+            <span>{{month}}</span>
+        </a>
+
+        <a href="/view_expiry?type=tomorrow" class="stat-box bg-tomorrow">
+            Expiring Tomorrow
+            <span>{{tomorrow}}</span>
+        </a>
+
+        <a href="/view_expiry?type=expired" class="stat-box bg-expired">
+            Expired Products
+            <span>{{expired}}</span>
+        </a>
+
+    </div>
+
+    <!-- 🔹 BUTTONS -->
+    <div class="btn-container">
+        <a href="/view_expiry" class="btn">View Expiry Table</a>
+        <a href="/add_stock" class="btn">Add New Stock</a>
+        <a href="/billing" class="btn">Billing Counter</a>
+    </div>
+
+</div>
+
+</body>
+</html>

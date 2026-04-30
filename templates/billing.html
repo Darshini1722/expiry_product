@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing Counter</title>
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Quagga -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+
+    <style>
+        #scanner {
+            width: 100%;
+            max-width: 400px;
+            margin: 1rem auto;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px dashed var(--card-border);
+        }
+
+        .scanner-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+        }
+
+        #alert {
+            font-weight: 600;
+            min-height: 24px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container glass-card">
+
+    <h2 style="text-align:center;">🧾 Billing Counter</h2>
+
+    <div class="scanner-section">
+
+        <!-- Buttons -->
+        <div class="btn-container">
+            <button onclick="startScanner()" class="btn">📷 Start Scanner</button>
+            <button onclick="stopScanner()" class="btn btn-secondary">⏹ Stop Scanner</button>
+        </div>
+
+        <!-- Camera View -->
+        <div id="scanner"></div>
+
+        <!-- Manual Input -->
+        <div class="input-group" style="max-width: 300px; width:100%;">
+            <label>Enter Barcode (Manual)</label>
+            <input type="text" id="barcodeInput" placeholder="Type barcode here">
+        </div>
+
+        <p id="alert"></p>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+        <table id="bill">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Batch</th>
+                    <th>Expiry</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="btn-container" style="margin-top: 1.5rem;">
+        <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
+    </div>
+
+</div>
+
+<script>
+let lastScanned = "";
+let scanning = false;
+
+// 🔁 PROCESS BARCODE
+function processBarcode(code) {
+
+    if(!code) return;
+
+    fetch("/getproduct/" + code)
+    .then(res => res.json())
+    .then(data => {
+
+        let alertEl = document.getElementById("alert");
+
+        if(data.error){
+            alertEl.innerText = "❌ Product not found";
+            alertEl.style.color = "var(--danger)";
+            return;
+        }
+
+        let table = document.getElementById("bill").getElementsByTagName('tbody')[0];
+        let row = table.insertRow(0);
+
+        row.insertCell(0).innerText = data.name;
+        row.insertCell(1).innerText = data.batch;
+        row.insertCell(2).innerText = data.expiry;
+
+        let statusCell = row.insertCell(3);
+
+        if(data.status === "EXPIRED"){
+            statusCell.innerText = "EXPIRED";
+            row.classList.add("row-red");
+            alertEl.innerText = "⚠️ Product Expired";
+            alertEl.style.color = "var(--danger)";
+        }
+        else if(data.status === "EXPIRING TOMORROW"){
+            statusCell.innerText = "SOON";
+            row.classList.add("row-orange");
+            alertEl.innerText = "⚠️ Expiring Tomorrow";
+            alertEl.style.color = "var(--warning)";
+        }
+        else{
+            statusCell.innerText = "SAFE";
+            row.classList.add("row-green");
+            alertEl.innerText = "✅ Product OK";
+            alertEl.style.color = "var(--success)";
+        }
+
+        navigator.vibrate?.(100);
+    });
+}
+
+// ▶️ START SCANNER
+function startScanner() {
+
+    if (scanning) return;
+
+    Quagga.init({
+        inputStream: {
+            type: "LiveStream",
+            target: document.querySelector('#scanner'),
+            constraints: {
+                facingMode: "environment"
+            },
+            area: {
+                top: "40%",
+                right: "15%",
+                left: "15%",
+                bottom: "40%"
+            }
+        },
+
+        locator: {
+            patchSize: "medium",
+            halfSample: true
+        },
+
+        frequency: 20,
+
+        decoder: {
+            readers: ["ean_reader"]
+        },
+
+        locate: true
+    },
+
+    function(err) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        Quagga.start();
+        scanning = true;
+    });
+
+    Quagga.onDetected(function(result) {
+
+        if (!scanning) return;
+
+        let code = result.codeResult.code;
+
+        if(code !== lastScanned){
+            lastScanned = code;
+            processBarcode(code);
+        }
+    });
+}
+
+// ⏹ STOP SCANNER (FIXED CAMERA LIGHT ISSUE)
+function stopScanner() {
+    if (!scanning) return;
+
+    Quagga.stop();
+    scanning = false;
+
+    // 🔥 FULL CAMERA RELEASE
+    let video = document.querySelector('#scanner video');
+
+    if (video && video.srcObject) {
+        let tracks = video.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+        video.srcObject = null;
+    }
+
+    document.getElementById("scanner").innerHTML = "";
+
+    console.log("Camera fully stopped");
+}
+
+// ⌨️ MANUAL INPUT
+document.getElementById("barcodeInput").addEventListener("change", function(){
+    processBarcode(this.value);
+    this.value = "";
+});
+</script>
+
+</body>
+</html>

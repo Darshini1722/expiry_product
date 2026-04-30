@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Expiry Table</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        h3 {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container glass-card">
+
+    <h2>Expiry Tracking Table</h2>
+
+    <div class="btn-container">
+        <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
+    </div>
+
+    <!-- 🔴 EXPIRED -->
+    {% if show == "all" or show == "expired" %}
+    <h3 style="color:#ff6b6b;">🔴 Expired Products</h3>
+    <table>
+        <tr><th>Product</th><th>Batch</th><th>Expiry</th><th>Status</th></tr>
+        {% for p in expired %}
+        <tr class="row-red">
+            <td>{{p.name}}</td>
+            <td>{{p.batch}}</td>
+            <td>{{p.expiry}}</td>
+            <td>Expired {{ p.days|abs }} days ago</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    <!-- 🟠 TOMORROW -->
+    {% if show == "all" or show == "tomorrow" %}
+    <h3 style="color:#ffa94d;">🟠 Expiring Tomorrow</h3>
+    <table>
+        <tr><th>Product</th><th>Batch</th><th>Expiry</th><th>Status</th></tr>
+        {% for p in tomorrow %}
+        <tr class="row-orange">
+            <td>{{p.name}}</td>
+            <td>{{p.batch}}</td>
+            <td>{{p.expiry}}</td>
+            <td>Expiring Tomorrow</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    <!-- 🟡 30 DAYS -->
+    {% if show == "all" or show == "month" %}
+    <h3 style="color:#ffd43b;">🟡 Expiring within 30 Days</h3>
+    <table>
+        <tr><th>Product</th><th>Batch</th><th>Expiry</th><th>Days Left</th></tr>
+        {% for p in month %}
+        <tr class="row-yellow">
+            <td>{{p.name}}</td>
+            <td>{{p.batch}}</td>
+            <td>{{p.expiry}}</td>
+            <td>{{p.days}} Days</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    <!-- 🟢 SAFE -->
+    {% if show == "all" or show == "safe" %}
+    <h3 style="color:#69db7c;">🟢 Safe Products</h3>
+    <table>
+        <tr><th>Product</th><th>Batch</th><th>Expiry</th><th>Days Left</th></tr>
+        {% for p in safe %}
+        <tr class="row-green">
+            <td>{{p.name}}</td>
+            <td>{{p.batch}}</td>
+            <td>{{p.expiry}}</td>
+            <td>{{p.days}} Days</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

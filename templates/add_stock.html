@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Stock</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container glass-card" style="max-width: 600px;">
+        <h2>Add New Stock</h2>
+        
+        <form action="/save_stock" method="POST">
+            <div class="input-group">
+                <label>Barcode</label>
+                <input type="text" name="barcode" required>
+            </div>
+            
+            <div class="input-group">
+                <label>Product Name</label>
+                <input type="text" name="name" required>
+            </div>
+            
+            <div class="input-group">
+                <label>Batch Number</label>
+                <input type="text" name="batch" required>
+            </div>
+            
+            <div class="input-group">
+                <label>Expiry Date</label>
+                <input type="date" name="expiry" required>
+            </div>
+            
+            <div class="input-group">
+                <label>Quantity</label>
+                <input type="number" name="quantity" required>
+            </div>
+            
+            <div class="btn-container" style="margin-top: 1rem;">
+                <button type="submit" class="btn" style="flex: 1;">Save Stock Item</button>
+                <a href="/" class="btn btn-secondary" style="flex: 1;">Back to Dashboard</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
