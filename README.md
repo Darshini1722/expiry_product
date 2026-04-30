@@ -1,0 +1,3 @@
+Expiry Product Management System
+
+The Expiry Product Management System is a web-based application designed to track and manage products based on their expiry dates. It helps users store product details and monitor items that are close to expiration. The system is developed using Python Flask for backend, MySQL for database management, and HTML/CSS for the frontend. It allows users to add, update, view, and delete product records بسهولة. The application automatically compares the current date with expiry dates to identify products nearing expiration. This helps in reducing wastage and improving inventory control. The dashboard provides a simple and clear overview of all stored products. Overall, the system makes product management more efficient and organized.
